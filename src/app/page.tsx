@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Plus, X, Trophy, Users, ShuffleIcon } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useLocale } from "@/lib/i18n/context"
@@ -72,9 +72,6 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-          {t.home.heading}
-        </h1>
         <p className="text-muted-foreground">{t.app.tagline}</p>
       </motion.div>
 
@@ -84,11 +81,7 @@ export default function Home() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         <Card>
-          <CardHeader>
-            <CardTitle>{t.home.newTournament}</CardTitle>
-            <CardDescription>{t.home.mode}:</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">{t.home.tournamentName}</Label>
