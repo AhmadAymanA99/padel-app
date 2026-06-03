@@ -14,7 +14,7 @@ import type { Match } from "@prisma/client"
 import { getMatchResult } from "./scoring"
 
 export async function createTournament(formData: FormData) {
-  const title = formData.get("title") as string
+  const title = (formData.get("title") as string) || new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })
   const mode = formData.get("mode") as string
   const legCount = parseInt(formData.get("legCount") as string) || 1
   const courtCount = parseInt(formData.get("courtCount") as string) || 1
@@ -27,8 +27,8 @@ export async function createTournament(formData: FormData) {
     .map((s) => s.trim())
     .filter(Boolean)
 
-  if (!title || playerNames.length < 2) {
-    throw new Error("Title and at least 2 players required")
+  if (playerNames.length < 2) {
+    throw new Error("At least 2 players required")
   }
 
   const creatorCode = generateCode()

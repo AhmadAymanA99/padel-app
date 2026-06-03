@@ -85,7 +85,7 @@ export default function Home() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">{t.home.tournamentName}</Label>
-                <Input id="title" name="title" placeholder={t.home.tournamentPlaceholder} required />
+                <Input id="title" name="title" placeholder={t.home.tournamentPlaceholder} />
               </div>
 
               <div className="space-y-2">
