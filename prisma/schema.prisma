@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tournament {
+  id          String   @id @default(cuid())
+  title       String
+  mode        String   // "league_cup", "cup", "free_for_all"
+  status      String   @default("setup")
+  legCount    Int      @default(1)
+  deuceRule   String   @default("classic_advantage")
+  courtCount  Int      @default(1)
+  targetScore Int      @default(24)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  creatorCode String
+
+  players Player[]
+  teams   Team[]
+  matches Match[]
+}
+
+model Player {
+  id           String   @id @default(cuid())
+  name         String
+  isGhost      Boolean  @default(false)
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  teamMemberships TeamMember[]
+}
+
+model Team {
+  id           String   @id @default(cuid())
+  name         String
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  members      TeamMember[]
+  matchesAsTeam1 Match[] @relation("team1Matches")
+  matchesAsTeam2 Match[] @relation("team2Matches")
+}
+
+model TeamMember {
+  id       String @id @default(cuid())
+  teamId   String
+  playerId String
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  @@unique([teamId, playerId])
+}
+
+model Match {
+  id           String   @id @default(cuid())
+  tournamentId String
+  round        Int      @default(0)
+  phase        String   @default("league")
+  status       String   @default("pending")
+  team1Id      String?
+  team2Id      String?
+  team1        Team?    @relation("team1Matches", fields: [team1Id], references: [id])
+  team2        Team?    @relation("team2Matches", fields: [team2Id], references: [id])
+  ffaPlayer1Id String?
+  ffaPlayer2Id String?
+  ffaPlayer3Id String?
+  ffaPlayer4Id String?
+  winnerId     String?
+  shareCode    String   @unique
+  creatorCode  String?
+  bracketPosition Int?
+  parentMatchId   String?
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  parentMatch Match?    @relation("BracketParent", fields: [parentMatchId], references: [id])
+  childMatches Match[]  @relation("BracketParent")
+  sets SetScore[]
+  edits ScoreEdit[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  version   Int      @default(1)
+}
+
+model SetScore {
+  id         String @id @default(cuid())
+  matchId    String
+  setNumber  Int
+  team1Score Int?
+  team2Score Int?
+  match      Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  @@unique([matchId, setNumber])
+}
+
+model ScoreEdit {
+  id        String   @id @default(cuid())
+  matchId   String
+  oldData   String
+  newData   String
+  createdAt DateTime @default(now())
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
